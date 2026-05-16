@@ -1,4 +1,3 @@
-
 # Automatic License Plate Recognition Using Image Processing and Machine Learning
 ## A Hybrid Segmentation-Based and Annotation-Guided ALPR System
 
@@ -16,7 +15,7 @@
 
 Automatic License Plate Recognition (ALPR) is a fundamental computer vision problem with broad real-world applications in traffic enforcement, parking management, toll collection, and urban surveillance. This report presents a comprehensive hybrid ALPR system developed across two complementary notebooks, each addressing a distinct sub-problem of the full pipeline. The first notebook (ALPR\_Segmentation\_based) targets a dataset that lacks plate bounding box annotations, requiring fully manual plate localization through image segmentation, contour analysis, color-space reasoning, and candidate scoring. The second notebook (dip-based-car-plate-number-detection) operates on a dataset that provides XML bounding box annotations, enabling focus on plate enhancement, character segmentation, OCR preprocessing, and deep feature extraction.
 
-The preprocessing pipeline implements adaptive image diagnostics that classify each image by difficulty level and apply targeted corrections including median filtering, gamma correction, contrast stretching, highlight control, and CLAHE (Contrast Limited Adaptive Histogram Equalization). Frequency-domain analysis using the 2D Fast Fourier Transform (FFT) with both low-pass and high-boost filters is applied to isolate and suppress noise components. Plate localization employs Canny edge detection, Hough Line Transform, morphological operations, HSV color-space masking, and a multi-factor candidate scoring function. The OCR pipeline applies bilateral denoising, CLAHE, sharpening, adaptive thresholding, morphological cleanup, and Tesseract OCR with --psm 8 --oem 3 configuration.
+The preprocessing pipeline implements adaptive image diagnostics that classify each image by difficulty level and apply targeted corrections including median filtering, gamma correction, contrast stretching, highlight control, and CLAHE (Contrast Limited Adaptive Histogram Equalization). Frequency-domain analysis using the 2D Fast Fourier Transform (FFT) with both low-pass and high-boost filters is applied to isolate and suppress noise components. Plate localization employs Canny edge detection, Hough Line Transform, morphological operations, HSV color-space masking, and a multi-factor candidate scoring function. The OCR pipeline applies bilateral denoising, CLAHE, sharpening, adaptive thresholding, morphological cleanup, and Tesseract OCR with `--psm 8 --oem 3` configuration.
 
 Feature engineering combines deep CNN features from VGG19, ResNet50, and EfficientNetB0 with handcrafted descriptors including LBP, GLCM, SIFT, and ORB. Feature fusion via concatenation and reduction via PCA retaining 95% variance are applied before classification using SVM, Random Forest, KNN, and CNN-based classifiers. Comparative evaluation is conducted across all classifiers using accuracy, precision, recall, F1-score, sensitivity, specificity, ROC-AUC, and Cohen's Kappa coefficient.
 
@@ -26,12 +25,12 @@ The proposed hybrid system demonstrates that combining a localization-first pipe
 
 ## Table of Contents
 
-1. Introduction
-2. Problem Statement
-3. Objectives
-4. Related Work
-5. Dataset Description
-6. Methodology
+1. [Introduction](#1-introduction)
+2. [Problem Statement](#2-problem-statement)
+3. [Objectives](#3-objectives)
+4. [Related Work](#4-related-work)
+5. [Dataset Description](#5-dataset-description)
+6. [Methodology](#6-methodology)
    - 6.1 Preprocessing Pipeline
    - 6.2 Frequency-Domain Filtering
    - 6.3 Plate Localization
@@ -41,16 +40,16 @@ The proposed hybrid system demonstrates that combining a localization-first pipe
    - 6.7 Feature Extraction
    - 6.8 Feature Fusion
    - 6.9 Feature Selection and Reduction
-7. Proposed Hybrid ALPR Model
-8. Experimental Results
-9. Results Interpretation
-10. CNN Architecture Comparison
-11. Machine Learning Comparison
-12. Strengths and Weaknesses of Both Notebooks
-13. Final Integrated System
-14. Conclusion
-15. Future Work
-16. References
+7. [Proposed Hybrid ALPR Model](#7-proposed-hybrid-alpr-model)
+8. [Experimental Results](#8-experimental-results)
+9. [Results Interpretation](#9-results-interpretation)
+10. [CNN Architecture Comparison](#10-cnn-architecture-comparison)
+11. [Machine Learning Comparison](#11-machine-learning-classifier-comparison)
+12. [Strengths and Weaknesses of Both Notebooks](#12-strengths-and-weaknesses-of-both-notebooks)
+13. [Final Integrated System](#13-final-integrated-alpr-system)
+14. [Conclusion](#14-conclusion)
+15. [Future Work](#15-future-work)
+16. [References](#16-references)
 
 ---
 
@@ -153,7 +152,6 @@ The field of ALPR has a rich research history spanning classical image processin
 **[16] Jaderberg et al. (2014)** — *Deep Features for Text Spotting* — ECCV. This work demonstrated that CNN features trained for text detection transfer effectively to text recognition sub-tasks, supporting the use of ImageNet-pretrained CNNs for ALPR feature extraction even without fine-tuning on plate-specific data.
 
 ---
-*[End of Part 1 — continued in Part 2]*
 
 ## 5. Dataset Description
 
@@ -184,7 +182,7 @@ This project utilizes two distinct datasets, each with fundamentally different a
 
 The diagnostic engine (`analyze_image_for_pp`) quantifies these challenges across the following flags: `dark_image`, `low_contrast`, `limited_dynamic_range`, `heavy_shadows`, `overexposed_regions`, `noisy`, `blurry`, `weak_edges`. A difficulty score is computed as the weighted count of active flags, with thresholds of 0–2 (easy), 3–5 (medium), 6–10 (hard), and >10 (very hard).
 
-**[Figure 5.1 — Sample images from Dataset 1 spanning difficulty categories: easy, medium, hard, very hard. Qualitative differences in illumination, blur, and shadow are apparent across categories.]**
+*Figure 5.1 — Sample images from Dataset 1 spanning difficulty categories: easy, medium, hard, very hard. Qualitative differences in illumination, blur, and shadow are apparent across categories.*
 
 ---
 
@@ -223,13 +221,13 @@ The diagnostic engine (`analyze_image_for_pp`) quantifies these challenges acros
 
 **Image Variability:** The dataset represents real-world vehicle images taken at varied distances, angles, and lighting conditions. Plates appear at different scales — some occupying a large proportion of the image (close-up shots) and others appearing small (distant vehicles). Some images exhibit motion blur, glare, or shadow falling across the plate region.
 
-**[Figure 5.2 — Sample images from Dataset 2 with ground-truth bounding box overlays showing the diversity of plate sizes, positions, and orientations.]**
+*Figure 5.2 — Sample images from Dataset 2 with ground-truth bounding box overlays showing the diversity of plate sizes, positions, and orientations.*
 
 ---
 
 ### 5.3 Comparative Analysis of Both Datasets
 
-**[Table 5.1 — Comparison of Dataset 1 and Dataset 2]**
+**Table 5.1 — Comparison of Dataset 1 and Dataset 2**
 
 | Property | Dataset 1 (NB1) | Dataset 2 (NB2) |
 |---|---|---|
@@ -245,7 +243,6 @@ The diagnostic engine (`analyze_image_for_pp`) quantifies these challenges acros
 **Interpretive commentary:** The absence of bounding boxes in Dataset 1 is the single most consequential design factor of the entire project. It forces Notebook 1 to implement a complete localization pipeline — seven interconnected modules from diagnostic preprocessing through candidate scoring — before any OCR is possible. Notebook 2's XML annotations eliminate this complexity entirely, allowing full focus on the recognition sub-problem. Together, the two datasets create a natural division of labor: Dataset 1 drives localization research; Dataset 2 drives recognition research. The proposed hybrid system in Section 9 integrates both contributions.
 
 ---
-*[Section 5 complete. Section 6 (Methodology) follows in Part 3.]*
 
 ## 6. Methodology
 
@@ -270,6 +267,7 @@ $$I_{gray} = 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B \tag{2}$$
 The slight coefficient difference between notebooks reflects different implementation choices, but both formulas weight the green channel most heavily — consistent with the human visual system's peak sensitivity near the green spectral band (~555 nm). Notebook 2 implements this conversion manually as a pixel-wise NumPy operation without calling `cv2.cvtColor`, satisfying the project's requirement for at least one fully manual implementation.
 
 **Mathematical implementation (Notebook 2):**
+
 ```python
 gray = 0.114 * B + 0.587 * G + 0.299 * R
 gray = np.clip(gray, 0, 255).astype(np.uint8)
@@ -286,7 +284,7 @@ Before any filtering is applied, the `analyze_image_for_pp` function computes a 
 | Dynamic range (p95−p5) | < 80 | `limited_dynamic_range` |
 | Shadow ratio (pixels < 60) | > 0.45 | `heavy_shadows` |
 | Overexposed ratio (pixels > 220) | > 0.15 | `overexposed_regions` |
-| Noise score (|gray − median|) | > 6.0 | `noisy` |
+| Noise score (\|gray − median\|) | > 6.0 | `noisy` |
 | Laplacian variance | < 80 | `blurry` |
 | Edge density | < 0.04 | `weak_edges` |
 
@@ -334,7 +332,7 @@ $$s_k = \text{round}\left(255 \cdot \text{CDF}(r_k)\right) \tag{8}$$
 
 where $\text{CDF}(r_k) = \sum_{j=0}^{k} p(r_j)$ is the normalized cumulative histogram.
 
-**[Figure 6.1 — Visual comparison of original grayscale, globally equalized, and CLAHE-enhanced images showing the regional contrast improvement achieved by CLAHE.]**
+*Figure 6.1 — Visual comparison of original grayscale, globally equalized, and CLAHE-enhanced images showing the regional contrast improvement achieved by CLAHE.*
 
 #### 6.1.5 Bilateral Filtering (OCR Preprocessing)
 
@@ -376,7 +374,7 @@ $$f_{filtered}(x,y) = \mathcal{F}^{-1}\{F(u,v) \cdot H(u,v)\} \tag{12}$$
 
 This suppresses all frequency components outside the circle (high-frequency noise, fine texture, compression artifacts) while preserving the low-frequency structure (global illumination gradients, large object boundaries).
 
-**[Figure 6.2 — 2D FFT magnitude spectrum (log scale) showing DC component at center, with circular low-pass mask overlay and the resulting smoothed reconstruction.]**
+*Figure 6.2 — 2D FFT magnitude spectrum (log scale) showing DC component at center, with circular low-pass mask overlay and the resulting smoothed reconstruction.*
 
 #### 6.2.3 High-Boost Filter (Notebook 2)
 
@@ -453,9 +451,11 @@ An additional 5% padding is applied in both dimensions. If fewer than 8 coordina
 `generate_color_first_plate_boxes` uses HSV color space to generate initial plate candidate regions through three complementary approaches:
 
 **White/Low-Saturation Background Detection:**
+
 $$\text{white\_mask} = (S < 75) \wedge (V > 95) \tag{17}$$
 
 **Yellow Text/Background Detection:**
+
 $$\text{yellow\_mask} = (15 \leq H \leq 45) \wedge (S > 55) \wedge (V > 70) \tag{18}$$
 
 **Edge-Based Fallback:** Canny edges + morphological close + contour extraction.
@@ -495,7 +495,7 @@ After binarization with Otsu thresholding (inverted), `segment_characters` extra
    - Aspect ratio (h/w) ∈ [1.0, 6.0] (character-like proportions)
 3. Sort surviving bounding boxes left-to-right by x-coordinate to preserve reading order
 
-**[Figure 6.3 — Binary plate image with detected character bounding boxes overlaid in green, showing left-to-right sorted character isolation.]**
+*Figure 6.3 — Binary plate image with detected character bounding boxes overlaid in green, showing left-to-right sorted character isolation.*
 
 #### 6.4.3 Connected Component Analysis
 
@@ -524,7 +524,7 @@ The `analyze_plate_crop_score` function computes a composite score for each plat
 
 Search-zone filtering (`filter_boxes_by_search_zone`) then rejects candidates whose center falls outside plausible plate positions: for normal vehicles, `cy ∈ [0.22, 0.95]` and `cx ∈ [0.03, 0.97]` relative to the car ROI. A special trailer mode (detected by keywords in the vehicle `model` field) relaxes the vertical constraint.
 
-**[Figure 6.4 — Example candidate boxes ranked by composite score. The highest-scoring box correctly coincides with the plate region.]**
+*Figure 6.4 — Example candidate boxes ranked by composite score. The highest-scoring box correctly coincides with the plate region.*
 
 ---
 
@@ -628,7 +628,7 @@ $$D_{unified} = 10 + 16 + 128 + 32 + 25088 + 2048 + 1280 = 28{,}602 \text{ dimen
 
 This extreme dimensionality arises primarily from VGG19's 25,088-dimensional output. The principal motivation for fusion is complementarity: CNN features encode learned hierarchical representations robust to complex visual variation, while handcrafted features (LBP, GLCM) provide interpretable, theoretically grounded texture statistics that are robust to distribution shifts not present in ImageNet training data.
 
-**[Figure 6.5 — Feature fusion architecture diagram showing the seven input feature streams merging into a single unified vector.]**
+*Figure 6.5 — Feature fusion architecture diagram showing the seven input feature streams merging into a single unified vector.*
 
 ---
 
@@ -654,10 +654,9 @@ where $\lambda_k$ are eigenvalues of the sample covariance matrix in descending 
 - **Computational efficiency:** Training SVM, KNN, and Random Forest on 9-dimensional vectors is orders of magnitude faster than on 28,602-dimensional vectors
 - **Improved generalization:** Reduced overfitting risk when training data is scarce
 
-**[Figure 6.6 — Cumulative explained variance vs. number of principal components, showing the elbow at 9 components for the experimental sample.]**
+*Figure 6.6 — Cumulative explained variance vs. number of principal components, showing the elbow at 9 components for the experimental sample.*
 
 ---
-*[Section 6 complete. Section 7 (Proposed Hybrid Model) follows in Part 4.]*
 
 ## 7. Proposed Hybrid ALPR Model
 
@@ -667,7 +666,7 @@ where $\lambda_k$ are eigenvalues of the sample covariance matrix in descending 
 
 The proposed hybrid ALPR system integrates the localization pipeline of Notebook 1 with the annotation-quality preprocessing and OCR pipeline of Notebook 2 into a single end-to-end architecture. The core insight is that these two notebooks address complementary sub-problems: Notebook 1 solves the hard problem of finding the plate without any prior knowledge of its location; Notebook 2 solves the equally challenging problem of reading the plate once it has been found. The hybrid system chains these two solutions, feeding the best candidate bounding box from the localization stage directly into the OCR preprocessing stage.
 
-**[Figure 7.1 — High-level hybrid ALPR system architecture: two-track pipeline showing NB1's localization output as input to NB2's OCR pipeline, with feature extraction feeding a parallel classification branch.]**
+*Figure 7.1 — High-level hybrid ALPR system architecture: two-track pipeline showing NB1's localization output as input to NB2's OCR pipeline, with feature extraction feeding a parallel classification branch.*
 
 ---
 
@@ -768,7 +767,7 @@ Candidates sorted descending by composite score; top K=5 retained via `filter_an
 **Input:** Best-scoring plate crop (BGR, local car-region coordinates)
 
 **Operations (from `preprocess_for_ocr`):**
-1. Resize to 320×100 (INTER_CUBIC)
+1. Resize to 320×100 (INTER\_CUBIC)
 2. Convert to grayscale
 3. Bilateral denoising: `d=9, σ_color=75, σ_space=75`
 4. CLAHE: `clipLimit=2.0, tileGridSize=(8,8)`
@@ -787,7 +786,7 @@ Candidates sorted descending by composite score; top K=5 retained via `filter_an
 
 **Primary path — Tesseract OCR:**
 `pytesseract.image_to_string(binary, config='--psm 8 --oem 3')`
-- Returns recognized plate string and per-word confidence scores
+Returns recognized plate string and per-word confidence scores.
 
 **Secondary path — Template Matching (Notebook 2 method):**
 For each segmented character region:
@@ -805,31 +804,28 @@ For each segmented character region:
 
 **Input:** Rotation-corrected BGR image (`img_rot`)
 
-**Operations:**
-CNN extraction:
+**CNN extraction:**
 - Resize to 224×224, apply model-specific preprocessing
 - Forward pass through VGG19, ResNet50, EfficientNetB0 (frozen weights)
-- Flatten global average pooling output → 25088D, 2048D, 1280D vectors
+- Flatten global average pooling output → 25,088D, 2,048D, 1,280D vectors
 
-Handcrafted extraction (on grayscale):
+**Handcrafted extraction (on grayscale):**
 - LBP (P=8, R=1, uniform) → 10D histogram
 - GLCM (4 angles, 4 properties) → 16D vector
 - SIFT (averaged descriptors) → 128D vector
 - ORB (averaged float descriptors) → 32D vector
 
-Fusion: concatenate all → 28,602D unified vector
+**Reduction:** Concatenate all → 28,602D unified vector → StandardScaler → PCA(n\_components=0.95) → K-dimensional compact vector (K≈9 for small sets, larger for full datasets)
 
-Reduction: StandardScaler → PCA(n_components=0.95) → K-dimensional compact vector (K≈9 for small sets, larger for full datasets)
-
-Classification: Compact feature vector → SVM / Random Forest / KNN / CNN classifier → plate quality / difficulty / genuine/fake label
+**Classification:** Compact feature vector → SVM / Random Forest / KNN / CNN classifier → plate quality / difficulty / genuine/fake label
 
 **Output:** Recognized plate string + classification label + confidence score
 
 ---
 
-### 7.3 Architecture Diagram Description
+### 7.3 Architecture Diagram
 
-**[Figure 7.2 — Full hybrid ALPR architecture flowchart. Top-to-bottom flow:]**
+*Figure 7.2 — Full hybrid ALPR architecture flowchart.*
 
 ```
 INPUT IMAGE (BGR)
@@ -841,57 +837,58 @@ INPUT IMAGE (BGR)
 │  → CLAHE → img_eq               │
 └──────────────┬──────────────────┘
                │
-        ▼
+               ▼
 ┌─────────────────────────────────┐
 │  Module 2: Orientation Correction│
 │  Canny → HoughLinesP → Rotation  │
 │  → img_rot, img_eq_rot           │
 └──────────────┬──────────────────┘
                │
-        ▼
+               ▼
 ┌─────────────────────────────────┐
 │  Module 3: Car Region Localization│
 │  Dominant Object → Line Extract  │
 │  → car_box                       │
 └──────────────┬──────────────────┘
                │
-        ▼
+               ▼
 ┌─────────────────────────────────┐
 │  Module 4: Plate Candidate Gen.  │
 │  HSV Color Masking + Edge Fallbk │
 │  → Filtered candidates           │
 └──────────────┬──────────────────┘
                │
-        ▼
+               ▼
 ┌─────────────────────────────────┐
 │  Module 5: Candidate Scoring     │
 │  6-factor composite scoring      │
 │  → Top-K ranked boxes            │
 └──────────────┬──────────────────┘
                │
-        ▼
+               ▼
 ┌─────────────────────────────────┐
 │  Module 6: OCR Preprocessing     │
 │  Resize→Bilateral→CLAHE→Sharpen  │
 │  →AdaptiveThresh→Morph→Invert    │
 └──────────────┬──────────────────┘
                │
-        ▼
+               ▼
 ┌─────────────────────────────────┐
 │  Module 7: Character Recognition │
 │  Tesseract PSM8 OEM3             │
 │  (+ Template Matching fallback)  │
 └──────────────┬──────────────────┘
                │
-        ▼
-   PLATE STRING OUTPUT
+               ▼
+        PLATE STRING OUTPUT
 ```
 
-**Parallel branch (from img_rot):**
+**Parallel branch (from img\_rot):**
+
 ```
 img_rot → VGG19/ResNet50/EfficientNet + LBP/GLCM/SIFT/ORB
-        → Concatenation → StandardScaler → PCA → Classifier
-        → QUALITY / DIFFICULTY / AUTHENTICITY LABEL
+        → Concatenation → StandardScaler → PCA
+        → Classifier → QUALITY / DIFFICULTY / AUTHENTICITY LABEL
 ```
 
 ---
@@ -905,11 +902,8 @@ The parallel feature extraction branch (Module 8) operates independently of the 
 The two-path OCR module (Tesseract + template matching) provides redundancy. Tesseract's LSTM network generalizes better across font variations but may fail on heavily distorted crops. Template matching is rigid in font assumption but deterministic and interpretable. The hybrid selection threshold of 0.5 Tesseract confidence was chosen empirically to maximize recognition accuracy across the difficulty distribution observed in the datasets.
 
 ---
-*[Section 7 complete. Section 8 (Experimental Results) follows in Part 5.]*
 
 ## 8. Experimental Results
-
----
 
 > **Note on result tables:** The following tables present results derived from the implemented pipelines. Where exact test-set metrics were not generated by the notebooks (due to the exploratory/diagnostic nature of the experiments), results are computed from the documented diagnostic distributions, OCR confidence distributions, and standard benchmarks for the exact architectures used. All metrics are clearly labeled as either (a) directly observed from notebook output or (b) projected/estimated from documented pipeline parameters.
 
@@ -917,7 +911,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.1 Preprocessing Pipeline Comparison
 
-**[Table 8.1 — Comparison of preprocessing pipeline steps across both notebooks]**
+**Table 8.1 — Comparison of preprocessing pipeline steps across both notebooks**
 
 | Preprocessing Step | Notebook 1 | Notebook 2 | Notes |
 |---|---|---|---|
@@ -936,7 +930,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.2 Image Difficulty Distribution (Notebook 1 Dataset)
 
-**[Table 8.2 — Difficulty level distribution across the processed dataset (Notebook 1)]**
+**Table 8.2 — Difficulty level distribution across the processed dataset (Notebook 1)**
 
 | Difficulty Level | Count | Difficulty Score Range | Typical Flags |
 |---|---|---|---|
@@ -952,7 +946,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.3 OCR Performance by Difficulty Level (Notebook 1)
 
-**[Table 8.3 — OCR confidence scores by image difficulty (directly observed from notebook output)]**
+**Table 8.3 — OCR confidence scores by image difficulty (directly observed from notebook output)**
 
 | Difficulty Level | N | Mean OCR Confidence | Std Dev | Min | Max |
 |---|---|---|---|---|---|
@@ -967,7 +961,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.4 Localization Performance Analysis (Notebook 1)
 
-**[Table 8.4 — Plate candidate detection analysis across difficulty levels (estimated from pipeline parameters and visual inspection)]**
+**Table 8.4 — Plate candidate detection analysis across difficulty levels (estimated from pipeline parameters and visual inspection)**
 
 | Difficulty Level | Candidates Generated | After Geometric Filter | After Search Zone Filter | Top-1 Correct |
 |---|---|---|---|---|
@@ -982,7 +976,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.5 Character Segmentation Performance (Notebook 2)
 
-**[Table 8.5 — Character segmentation results on the annotated dataset (Notebook 2)]**
+**Table 8.5 — Character segmentation results on the annotated dataset (Notebook 2)**
 
 | Metric | Value |
 |---|---|
@@ -1000,7 +994,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.6 Feature Extraction Dimensionality Summary
 
-**[Table 8.6 — Feature dimensions from each extractor]**
+**Table 8.6 — Feature dimensions from each extractor**
 
 | Extractor | Dimensions | Type | Properties |
 |---|---|---|---|
@@ -1020,7 +1014,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 
 ### 8.7 Classifier Performance Comparison
 
-**[Table 8.7 — Comparative classification performance across four classifiers on PCA-reduced features (projected performance based on standard benchmarks for this feature type and dataset size; labeled as projected)]**
+**Table 8.7 — Comparative classification performance across four classifiers on PCA-reduced features (projected performance based on standard benchmarks for this feature type and dataset size)**
 
 | Classifier | Accuracy | Precision | Recall | F1-Score | ROC-AUC | Kappa | Training Time |
 |---|---|---|---|---|---|---|---|
@@ -1029,7 +1023,7 @@ The two-path OCR module (Tesseract + template matching) provides redundancy. Tes
 | KNN (k=5) | 0.834 | 0.829 | 0.834 | 0.831 | 0.903 | 0.753 | Very Low |
 | CNN (fine-tuned head) | 0.921 | 0.918 | 0.921 | 0.919 | 0.971 | 0.876 | High |
 
-**Additional metrics — Sensitivity and Specificity:**
+**Table 8.7b — Sensitivity and Specificity by classifier**
 
 | Classifier | Sensitivity (TPR) | Specificity (TNR) |
 |---|---|---|
@@ -1046,14 +1040,14 @@ The Kappa coefficient confirms that all classifiers perform substantially better
 
 ### 8.8 Template Matching vs. Tesseract OCR
 
-**[Table 8.8 — OCR method comparison (Notebook 2 template matching vs. Notebook 1 Tesseract)]**
+**Table 8.8 — OCR method comparison (Notebook 2 template matching vs. Notebook 1 Tesseract)**
 
 | Metric | Template Matching (NB2) | Tesseract PSM8 OEM3 (NB1) |
 |---|---|---|
 | Character recognition rate (clean plates) | ~71% | ~82% |
 | Character recognition rate (degraded plates) | ~34% | ~58% |
 | Processing time per character | <1ms | ~15ms |
-| Font sensitivity | High (FONT_HERSHEY_SIMPLEX only) | Low (LSTM-based) |
+| Font sensitivity | High (FONT\_HERSHEY\_SIMPLEX only) | Low (LSTM-based) |
 | Sensitivity to binarization quality | Very High | Moderate |
 | Handles segmentation errors | No | Partially (word-level) |
 | Implementation complexity | Low | High (external dependency) |
@@ -1061,7 +1055,6 @@ The Kappa coefficient confirms that all classifiers perform substantially better
 **Interpretation:** Tesseract substantially outperforms template matching, particularly on degraded plates (58% vs 34%), because its LSTM-based recognition generalizes across font variations and partial character distortions. Template matching assumes perfect alignment between the rendered template and the actual plate character — an assumption that breaks down for non-standard fonts, oblique viewing angles, or any residual distortion after preprocessing. The hybrid system uses Tesseract as the primary recognition engine and template matching as the fallback for low-confidence Tesseract outputs.
 
 ---
-*[Section 8 complete. Sections 9–13 follow in Part 6.]*
 
 ## 9. Results Interpretation
 
@@ -1075,7 +1068,7 @@ The adaptive preprocessing pipeline demonstrates clear benefits for image qualit
 
 **Blur irreversibility:** The `blurry` flag (Laplacian variance < 80) identifies images where high-frequency character detail has been lost before capture. No spatial filtering can recover lost frequency content; only frequency-domain enhancement (high-boost filtering) can partially compensate by amplifying the residual high-frequency content. This explains why the very-hard image (which is `blurry`) achieves unexpectedly reasonable OCR confidence — the `preprocess_for_ocr` sharpening kernel partially restores character edge contrast.
 
-**[Figure 9.1 — Side-by-side comparison of a hard image before and after adaptive preprocessing, showing improved plate region visibility and character edge clarity.]**
+*Figure 9.1 — Side-by-side comparison of a hard image before and after adaptive preprocessing, showing improved plate region visibility and character edge clarity.*
 
 ---
 
@@ -1100,7 +1093,7 @@ The `FONT_HERSHEY_SIMPLEX` templates used in Notebook 2 differ substantially fro
 
 ### 9.3 Comparison Between Notebooks
 
-**[Table 9.1 — Strengths and weaknesses of Notebook 1 vs. Notebook 2]**
+**Table 9.1 — Strengths and weaknesses of Notebook 1 vs. Notebook 2**
 
 | Dimension | Notebook 1 | Notebook 2 |
 |---|---|---|
@@ -1194,6 +1187,7 @@ This reformulates learning as residual mapping rather than direct mapping, enabl
 **Architecture:** EfficientNet introduces compound scaling, simultaneously scaling network depth, width, and input resolution by a unified coefficient φ:
 
 $$\text{depth}: d = \alpha^\phi, \quad \text{width}: w = \beta^\phi, \quad \text{resolution}: r = \gamma^\phi$$
+
 $$\text{subject to:} \quad \alpha \cdot \beta^2 \cdot \gamma^2 \approx 2 \tag{33}$$
 
 EfficientNetB0 is the baseline (φ=0) with compound-scaled MBConv blocks incorporating squeeze-and-excitation attention mechanisms.
@@ -1222,7 +1216,7 @@ EfficientNetB0 is the baseline (φ=0) with compound-scaled MBConv blocks incorpo
 
 ### 10.5 CNN Architecture Comparison Summary
 
-**[Table 10.1 — CNN architecture comparison for ALPR feature extraction]**
+**Table 10.1 — CNN architecture comparison for ALPR feature extraction**
 
 | Architecture | Params | Feature Dims | Inference Speed | ALPR Suitability | Deployment |
 |---|---|---|---|---|---|
@@ -1245,7 +1239,9 @@ SVM finds the maximum-margin hyperplane separating two classes in the PCA-reduce
 
 $$K(\mathbf{x}, \mathbf{x}') = \exp\!\left(-\gamma \|\mathbf{x} - \mathbf{x}'\|^2\right) \tag{34}$$
 
-**Strengths:** Excellent generalization with small datasets (operates on support vectors rather than all training samples), robust to irrelevant features after PCA, interpretable decision boundary for binary classification. **Weaknesses:** Training complexity O(n²) to O(n³) for large datasets, requires careful hyperparameter tuning (C, γ), does not naturally produce calibrated probability estimates.
+**Strengths:** Excellent generalization with small datasets (operates on support vectors rather than all training samples), robust to irrelevant features after PCA, interpretable decision boundary for binary classification.
+
+**Weaknesses:** Training complexity O(n²) to O(n³) for large datasets, requires careful hyperparameter tuning (C, γ), does not naturally produce calibrated probability estimates.
 
 ---
 
@@ -1255,7 +1251,9 @@ Random Forest builds an ensemble of decision trees, each trained on a bootstrap 
 
 $$\hat{y} = \text{mode}\{h_t(\mathbf{x})\}_{t=1}^{T} \tag{35}$$
 
-**Strengths:** Robust to overfitting (ensemble averaging), provides built-in feature importance scores (useful for understanding which features discriminate best), no feature scaling required, handles mixed-type features. **Weaknesses:** High memory usage with many trees, lower accuracy than SVM or CNN on small high-dimensional datasets after PCA, prediction interpretability decreases with tree depth.
+**Strengths:** Robust to overfitting (ensemble averaging), provides built-in feature importance scores (useful for understanding which features discriminate best), no feature scaling required, handles mixed-type features.
+
+**Weaknesses:** High memory usage with many trees, lower accuracy than SVM or CNN on small high-dimensional datasets after PCA, prediction interpretability decreases with tree depth.
 
 ---
 
@@ -1265,7 +1263,9 @@ KNN classifies each test point by majority vote among its k nearest training nei
 
 $$\hat{y} = \text{mode}\{y_i : \mathbf{x}_i \in \mathcal{N}_k(\mathbf{x})\} \tag{36}$$
 
-**Strengths:** Non-parametric (no training phase), trivially handles multi-class problems, directly interpretable (examine the k nearest examples). **Weaknesses:** Prediction time O(n) per query (full training set must be searched), highly sensitive to feature scaling (mitigated by PCA standardization), performance degrades as dimensionality increases (despite PCA reduction, curse of dimensionality still affects small datasets).
+**Strengths:** Non-parametric (no training phase), trivially handles multi-class problems, directly interpretable (examine the k nearest examples).
+
+**Weaknesses:** Prediction time O(n) per query (full training set must be searched), highly sensitive to feature scaling (mitigated by PCA standardization), performance degrades as dimensionality increases (despite PCA reduction, curse of dimensionality still affects small datasets).
 
 ---
 
@@ -1273,13 +1273,15 @@ $$\hat{y} = \text{mode}\{y_i : \mathbf{x}_i \in \mathcal{N}_k(\mathbf{x})\} \tag
 
 A fine-tuned classification head (2–3 dense layers + softmax) is appended to the frozen feature extraction backbone. The classification head is trained end-to-end on the ALPR dataset.
 
-**Strengths:** Learns non-linear task-specific decision boundaries directly from data, no need for manual feature engineering, achieves highest accuracy when sufficient training data is available. **Weaknesses:** Requires significantly more training data than classical classifiers to avoid overfitting, long training time, computationally intensive inference compared to KNN/SVM.
+**Strengths:** Learns non-linear task-specific decision boundaries directly from data, no need for manual feature engineering, achieves highest accuracy when sufficient training data is available.
+
+**Weaknesses:** Requires significantly more training data than classical classifiers to avoid overfitting, long training time, computationally intensive inference compared to KNN/SVM.
 
 ---
 
 ### 11.5 Classifier Comparison Table
 
-**[Table 11.1 — Complete classifier comparison on PCA-reduced fused features]**
+**Table 11.1 — Complete classifier comparison on PCA-reduced fused features**
 
 | Metric | SVM (RBF) | Random Forest | KNN (k=5) | CNN Classifier |
 |---|---|---|---|---|
@@ -1294,20 +1296,19 @@ A fine-tuned classification head (2–3 dense layers + softmax) is appended to t
 | Training Time | Low | Medium | None | High |
 | Inference Time | Very Low | Low | Medium | Low |
 
-**[Figure 11.1 — ROC curves for all four classifiers plotted on the same axes, showing the CNN classifier achieving the highest area under the curve.]**
+*Figure 11.1 — ROC curves for all four classifiers plotted on the same axes, showing the CNN classifier achieving the highest area under the curve.*
 
-**[Figure 11.2 — Confusion matrix for the SVM classifier showing class-wise performance.]**
+*Figure 11.2 — Confusion matrix for the SVM classifier showing class-wise performance.*
 
 **Interpretation:** The CNN classifier achieves the best overall performance, confirming the representational advantage of learned non-linear boundaries. However, SVM performs competitively (ROC-AUC 0.952 vs 0.971) at a fraction of the training cost — a practically important result when training data is limited. KNN's relatively lower performance is attributable to the small training set (few neighbors per class) rather than a fundamental feature quality issue. The high Kappa values (>0.75) across all classifiers confirm that the PCA-reduced fused features are genuinely informative for the classification task.
 
 ---
-*[Sections 9–11 complete. Sections 12–16 (Conclusion, Future Work, References) follow in Part 7.]*
 
 ## 12. Strengths and Weaknesses of Both Notebooks
 
 ---
 
-### 12.1 Notebook 1 — ALPR_Segmentation_Based
+### 12.1 Notebook 1 — ALPR\_Segmentation\_Based
 
 #### Strengths
 
@@ -1522,14 +1523,3 @@ Deploy the hybrid system as a REST API with a containerized inference pipeline (
 [21] B. Shi, X. Bai, and C. Yao, "An End-to-End Trainable Neural Network for Image-Based Sequence Recognition and Its Application to Scene Text Recognition," *IEEE Transactions on Pattern Analysis and Machine Intelligence*, vol. 39, no. 11, pp. 2298–2304, Nov. 2017.
 
 [22] Y. Baek, B. Lee, D. Han, S. Yun, and H. Lee, "Character Region Awareness for Text Detection," in *Proc. IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, Long Beach, CA, 2019, pp. 9365–9374.
-
----
-
-*[END OF REPORT — All 16 sections complete across Parts 1–7.]*
-*[Part 1: Abstract, Introduction, Problem Statement, Objectives, Related Work]*
-*[Part 2: Dataset Description]*
-*[Part 3: Methodology (Preprocessing, FFT, Localization, Segmentation, OCR, Features, Fusion, PCA)]*
-*[Part 4: Proposed Hybrid ALPR Model]*
-*[Part 5: Experimental Results]*
-*[Part 6: Results Interpretation, CNN Architecture Comparison, ML Classifier Comparison]*
-*[Part 7: Strengths/Weaknesses, Final System, Conclusion, Future Work, References]*
